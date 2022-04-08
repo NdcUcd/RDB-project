@@ -581,3 +581,43 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+
+--Views creation
+CREATE VIEW unethical_score AS
+SELECT name_content, synopsis, studio_name, year_content, content_category_name,
+(SELECT COUNT(*)
+ FROM event_table E, status_table S
+ WHERE E.id_person = P.id_person
+ AND E.id_status = S.id_status
+ GROUP BY person_name
+)  AS `Unethical score` 
+FROM `nutflux`.`content` `c` 
+JOIN `nutflux`.`person` `p` 
+JOIN `nutflux`.`rating` `r` 
+JOIN `nutflux`.`works` `w` 
+JOIN `nutflux`.`event_table` `e` 
+JOIN `nutflux`.`studio` `s` 
+JOIN `nutflux`.`content_category` `cc` 
+WHERE ((`c`.`id_studio` = `s`.`id_studio`) 
+       AND (`c`.`id_content_category` = `cc`.`id_content_category`) 
+       AND (`c`.`id_content` = `r`.`id_content`) 
+       AND (`c`.`id_content` = `w`.`id_content`) 
+       AND (`p`.`id_person` = `w`.`id_person`)) 
+GROUP BY `c`.`name_content` 
+ORDER BY `Unethical score` DESC;
+
+
+CREATE VIEW unethical_prizes AS 
+SELECT P.prize_name, COUNT(0) AS "nb"
+FROM prize P, award A, person PE, event_table E, works W, status_table S
+WHERE P.id_prize = A.id_prize
+AND A.id_works = W.id_works
+AND PE.id_person = W.id_person
+AND PE.id_person = E.id_event
+AND E.id_status = S.id_status
+AND S.status = "convicted" 
+AND E.year_event < A.year_award
+GROUP BY P.prize_name;
+ORDER BY `unethical_prizes`.`nb` DESC;
