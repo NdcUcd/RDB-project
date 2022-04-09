@@ -610,14 +610,13 @@ ORDER BY `Unethical score` DESC;
 
 
 CREATE VIEW unethical_prizes AS 
-SELECT P.prize_name, COUNT(0) AS "nb"
-FROM prize P, award A, person PE, event_table E, works W, status_table S
+SELECT P.prize_name, PE.person_name, A.year_award, A.prize_won, E.year_event, C.crime_type
+FROM prize P, award A, person PE, event_table E, works W, status_table S, crime_type C
 WHERE P.id_prize = A.id_prize
 AND A.id_works = W.id_works
 AND PE.id_person = W.id_person
-AND PE.id_person = E.id_event
+AND PE.id_person = E.id_person
 AND E.id_status = S.id_status
-AND S.status = "convicted" 
-AND E.year_event < A.year_award
-GROUP BY P.prize_name;
-ORDER BY `unethical_prizes`.`nb` DESC;
+AND C.id_crime = E.id_crime
+AND S.status = "convicted"
+AND A.year_award >= E.year_event;
