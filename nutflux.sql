@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Apr 06, 2022 at 05:05 PM
+-- Generation Time: Apr 11, 2022 at 09:37 AM
 -- Server version: 8.0.27
 -- PHP Version: 7.4.26
 
@@ -151,6 +151,19 @@ INSERT INTO `content_category` (`id_content_category`, `content_category_name`) 
 -- --------------------------------------------------------
 
 --
+-- Stand-in structure for view `crime_by_role`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `crime_by_role`;
+CREATE TABLE IF NOT EXISTS `crime_by_role` (
+`role_type` varchar(255)
+,`crime_type` varchar(255)
+,`COUNT(0)` bigint
+);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `crime_type`
 --
 
@@ -177,11 +190,11 @@ INSERT INTO `crime_type` (`id_crime`, `crime_type`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `event`
+-- Table structure for table `event_table`
 --
 
-DROP TABLE IF EXISTS `event`;
-CREATE TABLE IF NOT EXISTS `event` (
+DROP TABLE IF EXISTS `event_table`;
+CREATE TABLE IF NOT EXISTS `event_table` (
   `id_event` int NOT NULL AUTO_INCREMENT,
   `id_person` int NOT NULL,
   `id_status` int NOT NULL,
@@ -194,10 +207,10 @@ CREATE TABLE IF NOT EXISTS `event` (
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `event`
+-- Dumping data for table `event_table`
 --
 
-INSERT INTO `event` (`id_event`, `id_person`, `id_status`, `id_crime`, `year_event`) VALUES
+INSERT INTO `event_table` (`id_event`, `id_person`, `id_status`, `id_crime`, `year_event`) VALUES
 (1, 1, 1, 1, 1977),
 (2, 2, 1, 5, 1980),
 (3, 2, 2, 2, 1980),
@@ -333,6 +346,33 @@ CREATE TABLE IF NOT EXISTS `rating` (
   KEY `FK_40` (`id_content`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `rating`
+--
+
+INSERT INTO `rating` (`id_user`, `id_content`, `note`) VALUES
+(1, 7, 7),
+(1, 9, 5),
+(1, 10, 1),
+(3, 6, 4),
+(3, 9, 8),
+(4, 3, 9),
+(4, 4, 6),
+(5, 3, 7),
+(6, 1, 9),
+(6, 5, 6),
+(6, 6, 3),
+(6, 7, 5),
+(7, 1, 9),
+(7, 2, 2),
+(7, 4, 4),
+(8, 2, 4),
+(8, 8, 4),
+(9, 5, 7),
+(9, 8, 3),
+(9, 10, 9),
+(10, 10, 8);
+
 -- --------------------------------------------------------
 
 --
@@ -409,21 +449,21 @@ INSERT INTO `social_relationship` (`id_person_1`, `id_person_2`, `relationship_t
 -- --------------------------------------------------------
 
 --
--- Table structure for table `status`
+-- Table structure for table `status_table`
 --
 
-DROP TABLE IF EXISTS `status`;
-CREATE TABLE IF NOT EXISTS `status` (
+DROP TABLE IF EXISTS `status_table`;
+CREATE TABLE IF NOT EXISTS `status_table` (
   `id_status` int NOT NULL AUTO_INCREMENT,
   `status` varchar(255) NOT NULL,
   PRIMARY KEY (`id_status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `status`
+-- Dumping data for table `status_table`
 --
 
-INSERT INTO `status` (`id_status`, `status`) VALUES
+INSERT INTO `status_table` (`id_status`, `status`) VALUES
 (1, 'convicted'),
 (2, 'acquitted'),
 (3, 'rumour'),
@@ -464,6 +504,62 @@ INSERT INTO `studio` (`id_studio`, `studio_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Stand-in structure for view `unethical_persons_relevant`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `unethical_persons_relevant`;
+CREATE TABLE IF NOT EXISTS `unethical_persons_relevant` (
+`person_name` varchar(255)
+,`nb` bigint
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `unethical_persons_unrelevant`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `unethical_persons_unrelevant`;
+CREATE TABLE IF NOT EXISTS `unethical_persons_unrelevant` (
+`person_name` varchar(255)
+,`nb` bigint
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `unethical_prizes`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `unethical_prizes`;
+CREATE TABLE IF NOT EXISTS `unethical_prizes` (
+`prize_name` varchar(255)
+,`person_name` varchar(255)
+,`year_award` int
+,`prize_won` tinyint(1)
+,`year_event` int
+,`crime_type` varchar(255)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `unethical_score`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `unethical_score`;
+CREATE TABLE IF NOT EXISTS `unethical_score` (
+`name_content` varchar(255)
+,`synopsis` varchar(255)
+,`studio_name` varchar(255)
+,`year_content` int
+,`content_category_name` varchar(255)
+,`Unethical score` bigint
+);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `user`
 --
 
@@ -473,7 +569,23 @@ CREATE TABLE IF NOT EXISTS `user` (
   `pro_user` tinyint(1) NOT NULL,
   `mail_user` varchar(255) NOT NULL,
   PRIMARY KEY (`id_user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id_user`, `pro_user`, `mail_user`) VALUES
+(1, 0, 'user1S@gmail.com'),
+(2, 0, 'user2S@gmail.com'),
+(3, 0, 'user3S@gmail.com'),
+(4, 0, 'user4S@gmail.com'),
+(5, 0, 'user5S@gmail.com'),
+(6, 1, 'user6P@gmail.com'),
+(7, 1, 'user7P@gmail.com'),
+(8, 1, 'user8P@gmail.com'),
+(9, 1, 'user9P@gmail.com'),
+(10, 1, 'user10P@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -496,7 +608,7 @@ CREATE TABLE IF NOT EXISTS `works` (
   KEY `FK_26` (`id_content`),
   KEY `FK_72` (`id_character_category`),
   KEY `FK_211` (`id_role_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `works`
@@ -513,7 +625,58 @@ INSERT INTO `works` (`id_works`, `id_person`, `id_content`, `id_character_catego
 (9, 2, 8, 3, 1, 666, 'Italian Cannibal', 1),
 (10, 8, 9, NULL, 6, 100000, 'Lumière', 0),
 (11, 9, 10, 5, 1, 7000000, 'Cleopatra', 0),
-(12, 10, 10, 4, 1, 300000, 'Caesar Augustus', 0);
+(12, 10, 10, 4, 1, 300000, 'Caesar Augustus', 0),
+(13, 2, 2, NULL, 2, 15000, NULL, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `crime_by_role`
+--
+DROP TABLE IF EXISTS `crime_by_role`;
+
+DROP VIEW IF EXISTS `crime_by_role`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `crime_by_role`  AS SELECT DISTINCT `r`.`role_type` AS `role_type`, `c`.`crime_type` AS `crime_type`, count(0) AS `COUNT(0)` FROM (((((`event_table` `e` join `person` `pe`) join `status_table` `s`) join `works` `w`) join `role_type` `r`) join `crime_type` `c`) WHERE ((`e`.`id_person` = `pe`.`id_person`) AND (`e`.`id_status` = `s`.`id_status`) AND (`pe`.`id_person` = `w`.`id_person`) AND (`r`.`id_role_type` = `w`.`id_role_type`) AND (`c`.`id_crime` = `e`.`id_crime`) AND (`s`.`status` = 'convicted')) GROUP BY `c`.`id_crime`, `r`.`id_role_type`, `w`.`id_works` ORDER BY `r`.`role_type` ASC ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `unethical_persons_relevant`
+--
+DROP TABLE IF EXISTS `unethical_persons_relevant`;
+
+DROP VIEW IF EXISTS `unethical_persons_relevant`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `unethical_persons_relevant`  AS SELECT `pe`.`person_name` AS `person_name`, count(0) AS `nb` FROM ((`person` `pe` join `event_table` `e`) join `status_table` `s`) WHERE ((`pe`.`id_person` = `e`.`id_person`) AND (`s`.`id_status` = `e`.`id_status`) AND (`s`.`status` <> 'rumour') AND (`s`.`status` <> 'acquitted') AND (`s`.`status` <> 'dropped charges')) GROUP BY `pe`.`person_name` ORDER BY `nb` DESC ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `unethical_persons_unrelevant`
+--
+DROP TABLE IF EXISTS `unethical_persons_unrelevant`;
+
+DROP VIEW IF EXISTS `unethical_persons_unrelevant`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `unethical_persons_unrelevant`  AS SELECT `pe`.`person_name` AS `person_name`, count(0) AS `nb` FROM (`person` `pe` join `event_table` `e`) WHERE (`pe`.`id_person` = `e`.`id_person`) GROUP BY `pe`.`person_name` ORDER BY `nb` DESC ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `unethical_prizes`
+--
+DROP TABLE IF EXISTS `unethical_prizes`;
+
+DROP VIEW IF EXISTS `unethical_prizes`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `unethical_prizes`  AS SELECT `p`.`prize_name` AS `prize_name`, `pe`.`person_name` AS `person_name`, `a`.`year_award` AS `year_award`, `a`.`prize_won` AS `prize_won`, `e`.`year_event` AS `year_event`, `c`.`crime_type` AS `crime_type` FROM ((((((`prize` `p` join `award` `a`) join `person` `pe`) join `event_table` `e`) join `works` `w`) join `status_table` `s`) join `crime_type` `c`) WHERE ((`p`.`id_prize` = `a`.`id_prize`) AND (`a`.`id_works` = `w`.`id_works`) AND (`pe`.`id_person` = `w`.`id_person`) AND (`pe`.`id_person` = `e`.`id_person`) AND (`e`.`id_status` = `s`.`id_status`) AND (`c`.`id_crime` = `e`.`id_crime`) AND (`s`.`status` = 'convicted') AND (`a`.`year_award` >= `e`.`year_event`)) ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `unethical_score`
+--
+DROP TABLE IF EXISTS `unethical_score`;
+
+DROP VIEW IF EXISTS `unethical_score`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `unethical_score`  AS SELECT `c`.`name_content` AS `name_content`, `c`.`synopsis` AS `synopsis`, `s`.`studio_name` AS `studio_name`, `c`.`year_content` AS `year_content`, `cc`.`content_category_name` AS `content_category_name`, (select count(0) from (`event_table` `e` join `status_table` `s`) where ((`e`.`id_person` = `p`.`id_person`) and (`e`.`id_status` = `s`.`id_status`)) group by `p`.`person_name`) AS `Unethical score` FROM ((((((`content` `c` join `person` `p`) join `rating` `r`) join `works` `w`) join `event_table` `e`) join `studio` `s`) join `content_category` `cc`) WHERE ((`c`.`id_studio` = `s`.`id_studio`) AND (`c`.`id_content_category` = `cc`.`id_content_category`) AND (`c`.`id_content` = `r`.`id_content`) AND (`c`.`id_content` = `w`.`id_content`) AND (`p`.`id_person` = `w`.`id_person`)) GROUP BY `c`.`name_content` ORDER BY `Unethical score` DESC ;
 
 --
 -- Constraints for dumped tables
@@ -534,12 +697,12 @@ ALTER TABLE `content`
   ADD CONSTRAINT `FK_62` FOREIGN KEY (`id_content_category`) REFERENCES `content_category` (`id_content_category`);
 
 --
--- Constraints for table `event`
+-- Constraints for table `event_table`
 --
-ALTER TABLE `event`
+ALTER TABLE `event_table`
   ADD CONSTRAINT `FK_177` FOREIGN KEY (`id_person`) REFERENCES `person` (`id_person`),
   ADD CONSTRAINT `FK_180` FOREIGN KEY (`id_crime`) REFERENCES `crime_type` (`id_crime`),
-  ADD CONSTRAINT `FK_190` FOREIGN KEY (`id_status`) REFERENCES `status` (`id_status`);
+  ADD CONSTRAINT `FK_190` FOREIGN KEY (`id_status`) REFERENCES `status_table` (`id_status`);
 
 --
 -- Constraints for table `person`
@@ -620,3 +783,33 @@ AND E.id_status = S.id_status
 AND C.id_crime = E.id_crime
 AND S.status = "convicted"
 AND A.year_award >= E.year_event;
+
+CREATE VIEW unethical_persons_unrelevant AS 
+SELECT PE.person_name, COUNT(0) as nb
+FROM person PE, event_table E
+WHERE PE.id_person = E.id_person
+GROUP BY PE.person_name
+ORDER BY nb DESC;
+
+CREATE VIEW unethical_persons_relevant AS 
+SELECT PE.person_name, COUNT(0) as nb
+FROM person PE, event_table E, status_table S
+WHERE PE.id_person = E.id_person
+AND S.id_status = E.id_status
+AND S.status != "rumour"
+AND S.status != "acquitted"
+AND S.status != "dropped charges"
+GROUP BY PE.person_name
+ORDER BY nb DESC;
+
+CREATE VIEW crime_by_role AS
+SELECT DISTINCT R.role_type, C.crime_type, COUNT(0)
+FROM event_table E, person PE, status_table S, works W, role_type R, crime_type C
+WHERE E.id_person = PE.id_person
+AND E.id_status = S.id_status
+AND PE.id_person = W.id_person
+AND R.id_role_type = W.id_role_type
+AND C.id_crime = E.id_crime
+AND S.status = "convicted"
+GROUP BY C.id_crime, R.id_role_type, W.id_works
+ORDER BY R.role_type;
