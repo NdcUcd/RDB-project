@@ -813,3 +813,65 @@ AND C.id_crime = E.id_crime
 AND S.status = "convicted"
 GROUP BY C.id_crime, R.id_role_type, W.id_works
 ORDER BY R.role_type;
+
+--Queries
+SELECT person_name, COUNT(*) AS nb 
+FROM event_table E, status_table S, person P 
+WHERE E.id_person = P.id_person 
+AND E.id_status = S.id_status 
+AND (S.status != "rumour" OR S.status != "acquitted") 
+GROUP BY person_name 
+ORDER BY nb DESC; 
+
+SELECT P1.person_name, P2.person_name
+FROM person P1, person P2, social_relationship SR, relationship_type R, event_table E, status_table S 
+WHERE P1.id_person = SR.id_person_1
+AND P2.id_person = SR.id_person_2
+AND SR.relationship_type_id = R.relationship_type_id
+AND (P1.id_person = E.id_person OR P2.id_person = E.id_person)
+AND E.id_status = S.id_status
+AND S.status = "convicted";
+
+
+SELECT P1.person_name AS "Married to a real life villain"
+FROM person P1, person P2, social_relationship SR, relationship_type R, event_table E, status_table S 
+WHERE P1.id_person = SR.id_person_1
+AND P2.id_person = SR.id_person_2
+AND SR.relationship_type_id = R.relationship_type_id
+AND P2.id_person = E.id_person
+AND E.id_status = S.id_status
+AND S.status = "convicted"
+UNION
+SELECT P2.person_name AS "Married to a real life villain"
+FROM person P1, person P2, social_relationship SR, relationship_type R, event_table E, status_table S 
+WHERE P2.id_person = SR.id_person_2
+AND P1.id_person = SR.id_person_1
+AND SR.relationship_type_id = R.relationship_type_id
+AND P1.id_person = E.id_person
+AND E.id_status = S.id_status
+AND S.status = "convicted";
+
+
+CREATE VIEW tempView AS
+(SELECT S.studio_name, CT.crime_type, COUNT(*) AS nb
+FROM studio S, content C, works W, person P, event_table E, crime_type CT
+WHERE S.id_studio = C.id_studio
+AND C.id_content = W.id_content
+AND W.id_person = P.id_person
+AND P.id_person = E.id_person
+AND E.id_crime = CT.id_crime
+GROUP BY S.id_studio, CT.id_crime
+ORDER BY S.id_studio);
+
+SELECT t1.* 
+FROM tempview t1
+INNER JOIN
+(
+    SELECT `studio_name`, MAX(nb) AS max_nb
+    FROM tempview
+    GROUP BY `studio_name`
+) AS t2
+    ON t1.studio_name = t2.studio_name
+    AND t1.nb = t2.max_nb;
+
+DROP VIEW tempview;
