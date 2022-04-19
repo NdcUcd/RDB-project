@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Apr 11, 2022 at 09:37 AM
+-- Generation Time: Apr 19, 2022 at 01:14 PM
 -- Server version: 8.0.27
 -- PHP Version: 7.4.26
 
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `character_category` (
   `id_character_category` int NOT NULL AUTO_INCREMENT,
   `character_category_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id_character_category`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `character_category`
@@ -82,7 +82,9 @@ INSERT INTO `character_category` (`id_character_category`, `character_category_n
 (2, 'spy'),
 (3, 'villain'),
 (4, 'cesar'),
-(5, 'cleopatra');
+(5, 'cleopatra'),
+(6, 'historical figure'),
+(7, 'artistocrat');
 
 -- --------------------------------------------------------
 
@@ -101,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `content` (
   PRIMARY KEY (`id_content`),
   KEY `FK_199` (`id_studio`),
   KEY `FK_64` (`id_content_category`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `content`
@@ -117,7 +119,9 @@ INSERT INTO `content` (`id_content`, `name_content`, `synopsis`, `id_studio`, `i
 (7, 'Demolition Man', 'A police officer is brought out of suspended animation in prison to pursue an old ultra-violent nemesis who is loose in a non-violent future society.', 8, 9, 1993),
 (8, 'Hostel: Part II', 'Three American college students studying abroad are lured to a Slovakian hostel and discover the grim reality behind it.', 9, 5, 2007),
 (9, 'Beauty and the Beast', 'A prince cursed to spend his days as a hideous monster sets out to regain his humanity by earning a young woman\'s love.', 10, 10, 1991),
-(10, 'Cleopatra', 'Queen Cleopatra VII of Egypt experiences both triumph and tragedy as she attempts to resist the imperial ambitions of Rome.', 12, 7, 1963);
+(10, 'Cleopatra', 'Queen Cleopatra VII of Egypt experiences both triumph and tragedy as she attempts to resist the imperial ambitions of Rome.', 12, 7, 1963),
+(11, 'Stalin\'s Couch', 'Set in the 1950s Soviet Union, centers on a young artist who is commissioned to create Stalin\'s monument and must go through KGB scrutiny.', 13, 7, 2016),
+(12, 'Rebecca', 'A young newlywed arrives at her husband\'s imposing family estate on a windswept English coast and finds herself battling the shadow of his first wife, Rebecca, whose legacy lives on in the house long after her death.', 4, 11, 2020);
 
 -- --------------------------------------------------------
 
@@ -130,7 +134,7 @@ CREATE TABLE IF NOT EXISTS `content_category` (
   `id_content_category` int NOT NULL AUTO_INCREMENT,
   `content_category_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id_content_category`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `content_category`
@@ -146,7 +150,8 @@ INSERT INTO `content_category` (`id_content_category`, `content_category_name`) 
 (7, 'historical drama'),
 (8, 'comedy-drama'),
 (9, 'science fiction'),
-(10, 'musical');
+(10, 'musical'),
+(11, 'thriller');
 
 -- --------------------------------------------------------
 
@@ -172,7 +177,7 @@ CREATE TABLE IF NOT EXISTS `crime_type` (
   `id_crime` int NOT NULL AUTO_INCREMENT,
   `crime_type` varchar(255) NOT NULL,
   PRIMARY KEY (`id_crime`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `crime_type`
@@ -185,7 +190,8 @@ INSERT INTO `crime_type` (`id_crime`, `crime_type`) VALUES
 (4, 'white collar crime'),
 (5, 'animal cruelty'),
 (6, 'violence'),
-(7, 'organised crime');
+(7, 'organised crime'),
+(8, 'Cannibalism');
 
 -- --------------------------------------------------------
 
@@ -204,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `event_table` (
   KEY `FK_179` (`id_person`),
   KEY `FK_182` (`id_crime`),
   KEY `FK_192` (`id_status`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `event_table`
@@ -222,7 +228,9 @@ INSERT INTO `event_table` (`id_event`, `id_person`, `id_status`, `id_crime`, `ye
 (9, 6, 1, 1, 2020),
 (10, 6, 1, 1, 2020),
 (11, 6, 6, 1, 2021),
-(12, 8, 3, 7, NULL);
+(12, 8, 3, 7, NULL),
+(13, 13, 4, 1, 2021),
+(14, 13, 3, 8, 2021);
 
 -- --------------------------------------------------------
 
@@ -266,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `person` (
   `person_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id_person`),
   KEY `FK_105` (`id_nationality`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `person`
@@ -282,7 +290,10 @@ INSERT INTO `person` (`id_person`, `birth_date`, `id_nationality`, `gender`, `pe
 (7, '1962-07-31', 3, 0, 'Wesley Snipes'),
 (8, '1935-10-20', 3, 0, 'Jerry Orbach'),
 (9, '1932-02-27', 4, 1, 'Elizabeth Taylor'),
-(10, '1925-11-10', 6, 0, 'Richard Burton');
+(10, '1925-11-10', 6, 0, 'Richard Burton'),
+(11, '1948-12-27', 1, 0, 'Gérard Depardieu'),
+(12, '1966-06-22', 1, 1, 'Emmanuelle Seigner'),
+(13, '1986-08-26', 3, 0, 'Armie Hammer');
 
 -- --------------------------------------------------------
 
@@ -302,7 +313,7 @@ CREATE TABLE IF NOT EXISTS `prize` (
 --
 
 INSERT INTO `prize` (`id_prize`, `prize_name`) VALUES
-(1, 'Palme d\'Or'),
+(1, 'Palme d\''Or'),
 (2, 'César'),
 (3, 'Oscar'),
 (4, 'BAFTA'),
@@ -315,7 +326,7 @@ INSERT INTO `prize` (`id_prize`, `prize_name`) VALUES
 (11, 'MTV Movie Awards'),
 (12, 'Grammy Award');
 
--- --------------------------------------------------------
+-------------------------------------------------------
 
 --
 -- Table structure for table `quote`
@@ -443,6 +454,7 @@ CREATE TABLE IF NOT EXISTS `social_relationship` (
 --
 
 INSERT INTO `social_relationship` (`id_person_1`, `id_person_2`, `relationship_type_id`, `starting_year`, `ending_year`) VALUES
+(1, 12, 1, 1989, NULL),
 (5, 4, 1, 2014, 2016),
 (10, 9, 2, 1965, 1970);
 
@@ -482,7 +494,7 @@ CREATE TABLE IF NOT EXISTS `studio` (
   `id_studio` int NOT NULL AUTO_INCREMENT,
   `studio_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id_studio`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `studio`
@@ -499,7 +511,21 @@ INSERT INTO `studio` (`id_studio`, `studio_name`) VALUES
 (8, 'Warner Bros.'),
 (9, 'Lionsgate'),
 (10, 'Buena Vista Pictures Distribution'),
-(12, '20th Century Fox');
+(12, '20th Century Fox'),
+(13, 'Alfama Films');
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `tempview`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `tempview`;
+CREATE TABLE IF NOT EXISTS `tempview` (
+`studio_name` varchar(255)
+,`crime_type` varchar(255)
+,`nb` bigint
+);
 
 -- --------------------------------------------------------
 
@@ -608,7 +634,7 @@ CREATE TABLE IF NOT EXISTS `works` (
   KEY `FK_26` (`id_content`),
   KEY `FK_72` (`id_character_category`),
   KEY `FK_211` (`id_role_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `works`
@@ -626,7 +652,10 @@ INSERT INTO `works` (`id_works`, `id_person`, `id_content`, `id_character_catego
 (10, 8, 9, NULL, 6, 100000, 'Lumière', 0),
 (11, 9, 10, 5, 1, 7000000, 'Cleopatra', 0),
 (12, 10, 10, 4, 1, 300000, 'Caesar Augustus', 0),
-(13, 2, 2, NULL, 2, 15000, NULL, 0);
+(13, 2, 2, NULL, 2, 15000, NULL, 0),
+(14, 12, 11, 6, 1, 150000, 'Lidia', 0),
+(15, 11, 11, 5, 1, 300000, 'Joseph Staline', 0),
+(16, 13, 12, 7, 1, 1000000, 'Maxime de Winter', 0);
 
 -- --------------------------------------------------------
 
@@ -637,6 +666,16 @@ DROP TABLE IF EXISTS `crime_by_role`;
 
 DROP VIEW IF EXISTS `crime_by_role`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `crime_by_role`  AS SELECT DISTINCT `r`.`role_type` AS `role_type`, `c`.`crime_type` AS `crime_type`, count(0) AS `COUNT(0)` FROM (((((`event_table` `e` join `person` `pe`) join `status_table` `s`) join `works` `w`) join `role_type` `r`) join `crime_type` `c`) WHERE ((`e`.`id_person` = `pe`.`id_person`) AND (`e`.`id_status` = `s`.`id_status`) AND (`pe`.`id_person` = `w`.`id_person`) AND (`r`.`id_role_type` = `w`.`id_role_type`) AND (`c`.`id_crime` = `e`.`id_crime`) AND (`s`.`status` = 'convicted')) GROUP BY `c`.`id_crime`, `r`.`id_role_type`, `w`.`id_works` ORDER BY `r`.`role_type` ASC ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `tempview`
+--
+DROP TABLE IF EXISTS `tempview`;
+
+DROP VIEW IF EXISTS `tempview`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tempview`  AS SELECT `s`.`studio_name` AS `studio_name`, `ct`.`crime_type` AS `crime_type`, count(0) AS `nb` FROM (((((`studio` `s` join `content` `c`) join `works` `w`) join `person` `p`) join `event_table` `e`) join `crime_type` `ct`) WHERE ((`s`.`id_studio` = `c`.`id_studio`) AND (`c`.`id_content` = `w`.`id_content`) AND (`w`.`id_person` = `p`.`id_person`) AND (`p`.`id_person` = `e`.`id_person`) AND (`e`.`id_crime` = `ct`.`id_crime`)) GROUP BY `s`.`id_studio`, `ct`.`id_crime` ORDER BY `s`.`id_studio` ASC ;
 
 -- --------------------------------------------------------
 
@@ -747,6 +786,7 @@ COMMIT;
 
 
 
+
 --Views creation
 CREATE VIEW unethical_score AS
 SELECT name_content, synopsis, studio_name, year_content, content_category_name,
@@ -772,6 +812,7 @@ GROUP BY `c`.`name_content`
 ORDER BY `Unethical score` DESC;
 
 
+#---------------------------------------------------------------------------
 CREATE VIEW unethical_prizes AS 
 SELECT P.prize_name, PE.person_name, A.year_award, A.prize_won, E.year_event, C.crime_type
 FROM prize P, award A, person PE, event_table E, works W, status_table S, crime_type C
@@ -784,6 +825,8 @@ AND C.id_crime = E.id_crime
 AND S.status = "convicted"
 AND A.year_award >= E.year_event;
 
+
+#---------------------------------------------------------------------------
 CREATE VIEW unethical_persons_unrelevant AS 
 SELECT PE.person_name, COUNT(0) as nb
 FROM person PE, event_table E
@@ -791,6 +834,8 @@ WHERE PE.id_person = E.id_person
 GROUP BY PE.person_name
 ORDER BY nb DESC;
 
+
+#---------------------------------------------------------------------------
 CREATE VIEW unethical_persons_relevant AS 
 SELECT PE.person_name, COUNT(0) as nb
 FROM person PE, event_table E, status_table S
@@ -802,6 +847,7 @@ AND S.status != "dropped charges"
 GROUP BY PE.person_name
 ORDER BY nb DESC;
 
+#---------------------------------------------------------------------------
 CREATE VIEW crime_by_role AS
 SELECT DISTINCT R.role_type, C.crime_type, COUNT(0)
 FROM event_table E, person PE, status_table S, works W, role_type R, crime_type C
@@ -815,6 +861,7 @@ GROUP BY C.id_crime, R.id_role_type, W.id_works
 ORDER BY R.role_type;
 
 --Queries
+#---------------------------------------------------------------------------
 SELECT person_name, COUNT(*) AS nb 
 FROM event_table E, status_table S, person P 
 WHERE E.id_person = P.id_person 
@@ -823,6 +870,8 @@ AND (S.status != "rumour" OR S.status != "acquitted")
 GROUP BY person_name 
 ORDER BY nb DESC; 
 
+
+#---------------------------------------------------------------------------
 SELECT P1.person_name, P2.person_name
 FROM person P1, person P2, social_relationship SR, relationship_type R, event_table E, status_table S 
 WHERE P1.id_person = SR.id_person_1
@@ -833,6 +882,7 @@ AND E.id_status = S.id_status
 AND S.status = "convicted";
 
 
+#---------------------------------------------------------------------------
 SELECT P1.person_name AS "Married to a real life villain"
 FROM person P1, person P2, social_relationship SR, relationship_type R, event_table E, status_table S 
 WHERE P1.id_person = SR.id_person_1
@@ -852,6 +902,7 @@ AND E.id_status = S.id_status
 AND S.status = "convicted";
 
 
+#---------------------------------------------------------------------------
 CREATE VIEW tempView AS
 (SELECT S.studio_name, CT.crime_type, COUNT(*) AS nb
 FROM studio S, content C, works W, person P, event_table E, crime_type CT
@@ -875,3 +926,6 @@ INNER JOIN
     AND t1.nb = t2.max_nb;
 
 DROP VIEW tempview;
+
+
+#---------Procedural elements
