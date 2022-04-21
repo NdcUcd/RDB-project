@@ -860,7 +860,7 @@ AND S.status = "convicted"
 GROUP BY C.id_crime, R.id_role_type, W.id_works
 ORDER BY R.role_type;
 
---Queries
+#-----------------------------------------------------------------------------Queries------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------
 SELECT person_name, COUNT(*) AS nb 
 FROM event_table E, status_table S, person P 
@@ -928,4 +928,47 @@ INNER JOIN
 DROP VIEW tempview;
 
 
-#---------Procedural elements
+#------------------------------------------------------------------------------------Procedural elements----------------------------------------------------------------------------
+
+
+#-------Updating subscription price
+BEGIN
+DECLARE  standardPrice FLOAT DEFAULT 8.99;
+DECLARE  proPrice FLOAT DEFAULT 15.99;
+
+DECLARE discount FLOAT DEFAULT 15;
+
+
+UPDATE user SET user.subscription_price = standardPrice WHERE user.pro_user = 0
+AND user.id_user = a_userID;
+
+UPDATE user SET user.subscription_price = proPrice WHERE user.pro_user = 1
+AND user.id_user = a_userID;
+
+UPDATE user SET user.subscription_price = ROUND(user.subscription_price * ((100 - discount) / 100), 2) WHERE user.subscription_date < DATE_SUB(NOW(),INTERVAL 1 YEAR)
+AND user.id_user = a_userID; 
+END
+
+#--------Updating content name if it starts with “The ”
+DROP TRIGGER IF EXISTS `UpdateContentName`
+DELIMITER $$
+CREATE DEFINER = `root`@`localhost` TRIGGER `UpdateContentName` BEFORE INSERT ON `content` 
+
+FOR EACH ROW BEGIN 
+IF NEW.name_content LIKE "The %" THEN 
+SET NEW.name_content = REPLACE(NEW.name_content, "The ", ""); 
+SET NEW.name_content = CONCAT(NEW.name_content, ", The"); 
+END IF;     
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS `UpdateContentName`;
+CREATE DEFINER = `root`@`localhost` TRIGGER `UpdateContentName` BEFORE INSERT ON `content` 
+
+FOR EACH ROW BEGIN 
+IF NEW.name_content LIKE "The %" THEN 
+SET NEW.name_content = REPLACE(NEW.name_content, "The ", ""); 
+SET NEW.name_content = CONCAT(NEW.name_content, ", The"); 
+END IF; 
+END
+
