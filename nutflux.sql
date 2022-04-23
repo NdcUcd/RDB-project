@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Apr 19, 2022 at 01:14 PM
+-- Generation Time: Apr 23, 2022 at 06:22 PM
 -- Server version: 8.0.27
 -- PHP Version: 7.4.26
 
@@ -20,6 +20,35 @@ SET time_zone = "+00:00";
 --
 -- Database: `nutflux`
 --
+
+DELIMITER $$
+--
+-- Procedures
+--
+DROP PROCEDURE IF EXISTS `ReinitUserSubcriptionPrice`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ReinitUserSubcriptionPrice` ()  BEGIN
+UPDATE user SET user.subscription_price = 0;
+END$$
+
+DROP PROCEDURE IF EXISTS `UpdateSubscriptionPrice`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateSubscriptionPrice` (IN `a_userID` INT)  BEGIN
+DECLARE  standardPrice FLOAT DEFAULT 8.99;
+DECLARE  proPrice FLOAT DEFAULT 15.99;
+
+DECLARE discount FLOAT DEFAULT 15;
+
+
+UPDATE user SET user.subscription_price = standardPrice WHERE user.pro_user = 0
+AND user.id_user = a_userID;
+
+UPDATE user SET user.subscription_price = proPrice WHERE user.pro_user = 1
+AND user.id_user = a_userID;
+
+UPDATE user SET user.subscription_price = ROUND(user.subscription_price * ((100 - discount) / 100), 2) WHERE user.subscription_date < DATE_SUB(NOW(),INTERVAL 1 YEAR)
+AND user.id_user = a_userID; 
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -71,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `character_category` (
   `id_character_category` int NOT NULL AUTO_INCREMENT,
   `character_category_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id_character_category`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `character_category`
@@ -84,7 +113,10 @@ INSERT INTO `character_category` (`id_character_category`, `character_category_n
 (4, 'cesar'),
 (5, 'cleopatra'),
 (6, 'historical figure'),
-(7, 'artistocrat');
+(7, 'artistocrat'),
+(8, 'nurse'),
+(9, 'parent'),
+(10, 'child');
 
 -- --------------------------------------------------------
 
@@ -100,28 +132,49 @@ CREATE TABLE IF NOT EXISTS `content` (
   `id_studio` int NOT NULL,
   `id_content_category` int NOT NULL,
   `year_content` int NOT NULL,
+  `season` int DEFAULT NULL,
+  `episode` int DEFAULT NULL,
   PRIMARY KEY (`id_content`),
   KEY `FK_199` (`id_studio`),
   KEY `FK_64` (`id_content_category`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `content`
 --
 
-INSERT INTO `content` (`id_content`, `name_content`, `synopsis`, `id_studio`, `id_content_category`, `year_content`) VALUES
-(1, 'The Pianist', 'A Polish Jewish musician struggles to survive the destruction of the Warsaw ghetto of World War II.', 1, 1, 2002),
-(2, 'Cannibal Holocaust', 'During a rescue mission into the Amazon rainforest, a professor stumbles across lost film shot by a missing documentary crew.', 3, 5, 1980),
-(3, 'House of Cards', 'A Congressman works with his equally conniving wife to exact revenge on the people who betrayed him.', 4, 6, 2013),
-(4, 'Mr. & Mrs. Smith', 'A bored married couple is surprised to learn that they are both assassins hired by competing agencies to kill each other.', 5, 3, 2005),
-(5, 'Gang of New York', 'In 1862, Amsterdam Vallon returns to the Five Points area of New York City seeking revenge against Bill the Butcher, his father\'s killer.', 6, 7, 2002),
-(6, 'Shakespeare in Love', 'The world\'s greatest ever playwright, William Shakespeare, is young, out of ideas and short of cash, but meets his ideal woman and is inspired to write one of his most famous plays.', 7, 7, 1998),
-(7, 'Demolition Man', 'A police officer is brought out of suspended animation in prison to pursue an old ultra-violent nemesis who is loose in a non-violent future society.', 8, 9, 1993),
-(8, 'Hostel: Part II', 'Three American college students studying abroad are lured to a Slovakian hostel and discover the grim reality behind it.', 9, 5, 2007),
-(9, 'Beauty and the Beast', 'A prince cursed to spend his days as a hideous monster sets out to regain his humanity by earning a young woman\'s love.', 10, 10, 1991),
-(10, 'Cleopatra', 'Queen Cleopatra VII of Egypt experiences both triumph and tragedy as she attempts to resist the imperial ambitions of Rome.', 12, 7, 1963),
-(11, 'Stalin\'s Couch', 'Set in the 1950s Soviet Union, centers on a young artist who is commissioned to create Stalin\'s monument and must go through KGB scrutiny.', 13, 7, 2016),
-(12, 'Rebecca', 'A young newlywed arrives at her husband\'s imposing family estate on a windswept English coast and finds herself battling the shadow of his first wife, Rebecca, whose legacy lives on in the house long after her death.', 4, 11, 2020);
+INSERT INTO `content` (`id_content`, `name_content`, `synopsis`, `id_studio`, `id_content_category`, `year_content`, `season`, `episode`) VALUES
+(1, 'The Pianist', 'A Polish Jewish musician struggles to survive the destruction of the Warsaw ghetto of World War II.', 1, 1, 2002, NULL, NULL),
+(2, 'Cannibal Holocaust', 'During a rescue mission into the Amazon rainforest, a professor stumbles across lost film shot by a missing documentary crew.', 3, 5, 1980, NULL, NULL),
+(3, 'House of Cards: Chapter 1', 'A Congressman works with his equally conniving wife to exact revenge on the people who betrayed him.', 4, 6, 2013, 1, 1),
+(4, 'Mr. & Mrs. Smith', 'A bored married couple is surprised to learn that they are both assassins hired by competing agencies to kill each other.', 5, 3, 2005, NULL, NULL),
+(5, 'Gang of New York', 'In 1862, Amsterdam Vallon returns to the Five Points area of New York City seeking revenge against Bill the Butcher, his father s killer.', 6, 7, 2002, NULL, NULL),
+(6, 'Shakespeare in Love', 'The world s greatest ever playwright, William Shakespeare, is young, out of ideas and short of cash, but meets his ideal woman and is inspired to write one of his most famous plays.', 7, 7, 1998, NULL, NULL),
+(7, 'Demolition Man', 'A police officer is brought out of suspended animation in prison to pursue an old ultra-violent nemesis who is loose in a non-violent future society.', 8, 9, 1993, NULL, NULL),
+(8, 'Hostel: Part II', 'Three American college students studying abroad are lured to a Slovakian hostel and discover the grim reality behind it.', 9, 5, 2007, NULL, NULL),
+(9, 'Beauty and the Beast', 'A prince cursed to spend his days as a hideous monster sets out to regain his humanity by earning a young woman s love.', 10, 10, 1991, NULL, NULL),
+(10, 'Cleopatra', 'Queen Cleopatra VII of Egypt experiences both triumph and tragedy as she attempts to resist the imperial ambitions of Rome.', 12, 7, 1963, NULL, NULL),
+(11, 'Stalin s Couch', 'Set in the 1950s Soviet Union, centers on a young artist who is commissioned to create Stalin s monument and must go through KGB scrutiny.', 13, 7, 2016, NULL, NULL),
+(12, 'Rebecca', 'A young newlywed arrives at her husband s imposing family estate on a windswept English coast and finds herself battling the shadow of his first wife, Rebecca, whose legacy lives on in the house long after her death.', 4, 11, 2020, NULL, NULL),
+(36, 'Ondata di piacere', 'A young couple becomes embroiled with the personal problems of another couple on a yacht moored off Sicily during a turbulent weekend of fun, games, sex games, betrayal, spouse abuse, and murder.', 14, 12, 1975, NULL, NULL),
+(37, 'Awake', 'A wealthy young man undergoing heart transplant surgery discovers that the surgical team intend to murder him.', 2, 11, 2007, NULL, NULL),
+(38, 'Le Garçu', 'Antoine is four years old. His father Gerard leaves his mother Sophie. Gerard has several mistresses, but never knows how to leave them. Sophie takes a new lover, Jeannot.', 15, 1, 1995, NULL, NULL),
+(39, 'Aime ton père', 'While the whole world thinks writer Léo Shepherd is dead, he is kidnapped by his son Paul.', 16, 1, 2002, NULL, NULL),
+(40, 'Rush Hour 3', 'After an attempted assassination on Ambassador Han, Lee and Carter head to Paris to protect a French woman with knowledge of the Triads  secret leaders.', 17, 3, 2007, NULL, NULL);
+
+--
+-- Triggers `content`
+--
+DROP TRIGGER IF EXISTS `UpdateContentName`;
+DELIMITER $$
+CREATE TRIGGER `UpdateContentName` BEFORE INSERT ON `content` FOR EACH ROW BEGIN 
+IF NEW.name_content LIKE "The %" THEN 
+SET NEW.name_content = REPLACE(NEW.name_content, "The ", ""); 
+SET NEW.name_content = CONCAT(NEW.name_content, ", The"); 
+END IF;     
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -134,7 +187,7 @@ CREATE TABLE IF NOT EXISTS `content_category` (
   `id_content_category` int NOT NULL AUTO_INCREMENT,
   `content_category_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id_content_category`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `content_category`
@@ -151,7 +204,8 @@ INSERT INTO `content_category` (`id_content_category`, `content_category_name`) 
 (8, 'comedy-drama'),
 (9, 'science fiction'),
 (10, 'musical'),
-(11, 'thriller');
+(11, 'thriller'),
+(12, 'Erotic');
 
 -- --------------------------------------------------------
 
@@ -177,7 +231,7 @@ CREATE TABLE IF NOT EXISTS `crime_type` (
   `id_crime` int NOT NULL AUTO_INCREMENT,
   `crime_type` varchar(255) NOT NULL,
   PRIMARY KEY (`id_crime`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `crime_type`
@@ -191,7 +245,10 @@ INSERT INTO `crime_type` (`id_crime`, `crime_type`) VALUES
 (5, 'animal cruelty'),
 (6, 'violence'),
 (7, 'organised crime'),
-(8, 'Cannibalism');
+(8, 'Cannibalism'),
+(9, 'drug offences'),
+(10, 'threat'),
+(11, 'drug–impaired driving');
 
 -- --------------------------------------------------------
 
@@ -210,7 +267,7 @@ CREATE TABLE IF NOT EXISTS `event_table` (
   KEY `FK_179` (`id_person`),
   KEY `FK_182` (`id_crime`),
   KEY `FK_192` (`id_status`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `event_table`
@@ -230,7 +287,10 @@ INSERT INTO `event_table` (`id_event`, `id_person`, `id_status`, `id_crime`, `ye
 (11, 6, 6, 1, 2021),
 (12, 8, 3, 7, NULL),
 (13, 13, 4, 1, 2021),
-(14, 13, 3, 8, 2021);
+(14, 13, 3, 8, 2021),
+(15, 17, 1, 9, 1993),
+(16, 17, 1, 10, 2003),
+(17, 17, 1, 11, 2008);
 
 -- --------------------------------------------------------
 
@@ -274,7 +334,7 @@ CREATE TABLE IF NOT EXISTS `person` (
   `person_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id_person`),
   KEY `FK_105` (`id_nationality`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `person`
@@ -293,7 +353,12 @@ INSERT INTO `person` (`id_person`, `birth_date`, `id_nationality`, `gender`, `pe
 (10, '1925-11-10', 6, 0, 'Richard Burton'),
 (11, '1948-12-27', 1, 0, 'Gérard Depardieu'),
 (12, '1966-06-22', 1, 1, 'Emmanuelle Seigner'),
-(13, '1986-08-26', 3, 0, 'Armie Hammer');
+(13, '1986-08-26', 3, 0, 'Armie Hammer'),
+(14, '1951-09-28', 5, 1, 'Silvia Dionisio'),
+(15, '1976-04-14', 4, 1, 'Georgina Chapman'),
+(16, '1941-08-05', 1, 1, 'Élisabeth Guignot'),
+(17, '1971-04-07', 1, 0, 'Guillaume Depardieu'),
+(18, '1973-06-18', 1, 1, 'Julie Depardieu');
 
 -- --------------------------------------------------------
 
@@ -313,7 +378,7 @@ CREATE TABLE IF NOT EXISTS `prize` (
 --
 
 INSERT INTO `prize` (`id_prize`, `prize_name`) VALUES
-(1, 'Palme d\''Or'),
+(1, 'Palme d Or'),
 (2, 'César'),
 (3, 'Oscar'),
 (4, 'BAFTA'),
@@ -326,7 +391,7 @@ INSERT INTO `prize` (`id_prize`, `prize_name`) VALUES
 (11, 'MTV Movie Awards'),
 (12, 'Grammy Award');
 
--------------------------------------------------------
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `quote`
@@ -395,7 +460,7 @@ CREATE TABLE IF NOT EXISTS `relationship_type` (
   `relationship_type_id` int NOT NULL AUTO_INCREMENT,
   `relationship_type_name` varchar(255) NOT NULL,
   PRIMARY KEY (`relationship_type_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `relationship_type`
@@ -403,7 +468,9 @@ CREATE TABLE IF NOT EXISTS `relationship_type` (
 
 INSERT INTO `relationship_type` (`relationship_type_id`, `relationship_type_name`) VALUES
 (1, 'marriage'),
-(2, 'friendship');
+(2, 'friendship'),
+(3, 'extramarital affair'),
+(4, 'parent-child');
 
 -- --------------------------------------------------------
 
@@ -455,8 +522,17 @@ CREATE TABLE IF NOT EXISTS `social_relationship` (
 
 INSERT INTO `social_relationship` (`id_person_1`, `id_person_2`, `relationship_type_id`, `starting_year`, `ending_year`) VALUES
 (1, 12, 1, 1989, NULL),
+(2, 14, 1, 1971, 1979),
 (5, 4, 1, 2014, 2016),
-(10, 9, 2, 1965, 1970);
+(6, 15, 1, 2007, 2017),
+(10, 9, 1, 1964, 1976),
+(10, 9, 3, 1961, 1964),
+(11, 17, 4, 1971, NULL),
+(16, 11, 1, 1970, 1996),
+(16, 17, 4, 1971, NULL),
+(17, 11, 4, 1971, NULL),
+(18, 11, 4, 1973, NULL),
+(18, 16, 4, 1973, NULL);
 
 -- --------------------------------------------------------
 
@@ -494,7 +570,7 @@ CREATE TABLE IF NOT EXISTS `studio` (
   `id_studio` int NOT NULL AUTO_INCREMENT,
   `studio_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id_studio`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `studio`
@@ -512,7 +588,11 @@ INSERT INTO `studio` (`id_studio`, `studio_name`) VALUES
 (9, 'Lionsgate'),
 (10, 'Buena Vista Pictures Distribution'),
 (12, '20th Century Fox'),
-(13, 'Alfama Films');
+(13, 'Alfama Films'),
+(14, 'Independent film'),
+(15, 'PolyGram Film Distribution'),
+(16, 'Union Générale Cinématographique'),
+(17, 'Roger Birnbaum Productions');
 
 -- --------------------------------------------------------
 
@@ -594,6 +674,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `id_user` int NOT NULL AUTO_INCREMENT,
   `pro_user` tinyint(1) NOT NULL,
   `mail_user` varchar(255) NOT NULL,
+  `subscription_date` date NOT NULL,
+  `subscription_price` float NOT NULL,
   PRIMARY KEY (`id_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -601,17 +683,17 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id_user`, `pro_user`, `mail_user`) VALUES
-(1, 0, 'user1S@gmail.com'),
-(2, 0, 'user2S@gmail.com'),
-(3, 0, 'user3S@gmail.com'),
-(4, 0, 'user4S@gmail.com'),
-(5, 0, 'user5S@gmail.com'),
-(6, 1, 'user6P@gmail.com'),
-(7, 1, 'user7P@gmail.com'),
-(8, 1, 'user8P@gmail.com'),
-(9, 1, 'user9P@gmail.com'),
-(10, 1, 'user10P@gmail.com');
+INSERT INTO `user` (`id_user`, `pro_user`, `mail_user`, `subscription_date`, `subscription_price`) VALUES
+(1, 0, 'user1S@gmail.com', '2020-04-15', 0),
+(2, 0, 'user2S@gmail.com', '2022-04-01', 0),
+(3, 0, 'user3S@gmail.com', '2018-04-10', 0),
+(4, 0, 'user4S@gmail.com', '2019-01-16', 0),
+(5, 0, 'user5S@gmail.com', '2022-02-15', 8.99),
+(6, 1, 'user6P@gmail.com', '2018-04-12', 0),
+(7, 1, 'user7P@gmail.com', '2021-09-02', 0),
+(8, 1, 'user8P@gmail.com', '2020-08-28', 0),
+(9, 1, 'user9P@gmail.com', '2019-09-13', 0),
+(10, 1, 'user10P@gmail.com', '2021-10-12', 0);
 
 -- --------------------------------------------------------
 
@@ -634,7 +716,7 @@ CREATE TABLE IF NOT EXISTS `works` (
   KEY `FK_26` (`id_content`),
   KEY `FK_72` (`id_character_category`),
   KEY `FK_211` (`id_role_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `works`
@@ -655,7 +737,11 @@ INSERT INTO `works` (`id_works`, `id_person`, `id_content`, `id_character_catego
 (13, 2, 2, NULL, 2, 15000, NULL, 0),
 (14, 12, 11, 6, 1, 150000, 'Lidia', 0),
 (15, 11, 11, 5, 1, 300000, 'Joseph Staline', 0),
-(16, 13, 12, 7, 1, 1000000, 'Maxime de Winter', 0);
+(16, 13, 12, 7, 1, 1000000, 'Maxime de Winter', 0),
+(17, 15, 37, 8, 1, 100000, 'Penny Carver', 0),
+(18, 16, 38, 9, 1, 65000, 'Micheline', 0),
+(19, 17, 39, 10, 1, 15000, 'Paul Shepherd', 0),
+(20, 18, 40, 2, 1, 150000, 'Paulette', 0);
 
 -- --------------------------------------------------------
 
@@ -783,6 +869,7 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
 
 
 
