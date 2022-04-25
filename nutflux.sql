@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Apr 23, 2022 at 06:22 PM
+-- Generation Time: Apr 25, 2022 at 08:18 AM
 -- Server version: 8.0.27
 -- PHP Version: 7.4.26
 
@@ -160,7 +160,7 @@ INSERT INTO `content` (`id_content`, `name_content`, `synopsis`, `id_studio`, `i
 (37, 'Awake', 'A wealthy young man undergoing heart transplant surgery discovers that the surgical team intend to murder him.', 2, 11, 2007, NULL, NULL),
 (38, 'Le Garçu', 'Antoine is four years old. His father Gerard leaves his mother Sophie. Gerard has several mistresses, but never knows how to leave them. Sophie takes a new lover, Jeannot.', 15, 1, 1995, NULL, NULL),
 (39, 'Aime ton père', 'While the whole world thinks writer Léo Shepherd is dead, he is kidnapped by his son Paul.', 16, 1, 2002, NULL, NULL),
-(40, 'Rush Hour 3', 'After an attempted assassination on Ambassador Han, Lee and Carter head to Paris to protect a French woman with knowledge of the Triads  secret leaders.', 17, 3, 2007, NULL, NULL);
+(40, 'Rush Hour 3', 'After an attempted assassination on Ambassador Han, Lee and Carter head to Paris to protect a French woman with knowledge of the Triads secret leaders.', 17, 3, 2007, NULL, NULL);
 
 --
 -- Triggers `content`
@@ -378,7 +378,7 @@ CREATE TABLE IF NOT EXISTS `prize` (
 --
 
 INSERT INTO `prize` (`id_prize`, `prize_name`) VALUES
-(1, 'Palme d Or'),
+(1, 'Palme dOr'),
 (2, 'César'),
 (3, 'Oscar'),
 (4, 'BAFTA'),
@@ -404,7 +404,23 @@ CREATE TABLE IF NOT EXISTS `quote` (
   `id_content` int NOT NULL,
   PRIMARY KEY (`id_quote`),
   KEY `FK_58` (`id_content`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `quote`
+--
+
+INSERT INTO `quote` (`id_quote`, `quote_content`, `id_content`) VALUES
+(1, 'Simon says, \"Die.\" ', 7),
+(2, 'When you kill a king, you dont stab him in the dark. You kill him where the entire court can watch him die.', 5),
+(3, 'Your tongue is old, but sharp, Cicero. Be careful how you waggle it. One day it will cut off your head. ', 10),
+(4, 'How DARE you and the rest of your barbarians set fire to my library! Play conqueror all you want, Mighty Caesar! Rape, murder, pillage thousands, even millions of human beings! But neither you nor any other barbarian has the right to destroy one human tho', 10),
+(5, '- I have spoken with your father.\r\n\r\n- So, my lord? I speak with him every day.', 6),
+(6, 'Is he hot, or is he too Eastern Bloc? ', 8),
+(7, '- No-one play Chopin like you.\n\n- I hope that s a compliment.', 1),
+(8, 'We have an unusual problem here, Jane. You obviously want me dead, and Im less and less concerned for your well-being. ', 4),
+(9, '- You did it, goddamnit! Theyve just invited us to dinner!\r\n\r\n- They what?', 2),
+(10, 'In there, the more you carry, the quicker you get tired, the sooner you die. ', 2);
 
 -- --------------------------------------------------------
 
@@ -872,34 +888,25 @@ COMMIT;
 
 
 
-
-
---Views creation
+-----------------------------------------------------------------------------VIEWS CREATION----------------------------------------------------------------------------------------
+#--------------------unethical_score view
 CREATE VIEW unethical_score AS
-SELECT name_content, synopsis, studio_name, year_content, content_category_name,
-(SELECT COUNT(*)
- FROM event_table E, status_table S
+SELECT name_content, synopsis, studio_name, year_content,
+(SELECT COUNT(*) AS NB
+ FROM event_table E, status_table ST
  WHERE E.id_person = P.id_person
- AND E.id_status = S.id_status
- GROUP BY person_name
-)  AS `Unethical score` 
-FROM `nutflux`.`content` `c` 
-JOIN `nutflux`.`person` `p` 
-JOIN `nutflux`.`rating` `r` 
-JOIN `nutflux`.`works` `w` 
-JOIN `nutflux`.`event_table` `e` 
-JOIN `nutflux`.`studio` `s` 
-JOIN `nutflux`.`content_category` `cc` 
-WHERE ((`c`.`id_studio` = `s`.`id_studio`) 
-       AND (`c`.`id_content_category` = `cc`.`id_content_category`) 
-       AND (`c`.`id_content` = `r`.`id_content`) 
-       AND (`c`.`id_content` = `w`.`id_content`) 
-       AND (`p`.`id_person` = `w`.`id_person`)) 
-GROUP BY `c`.`name_content` 
+ AND E.id_status = ST.id_status
+ GROUP BY person_name)  AS `Unethical score` 
+FROM content C, person P, works W, event_table E, studio S
+WHERE C.id_studio = S.id_studio
+       AND C.id_content = W.id_content
+       AND P.id_person = W.id_person
+       AND E.id_person = P.id_person
+GROUP BY C.name_content
 ORDER BY `Unethical score` DESC;
 
 
-#---------------------------------------------------------------------------
+#--------------------unethical_prize view
 CREATE VIEW unethical_prizes AS 
 SELECT P.prize_name, PE.person_name, A.year_award, A.prize_won, E.year_event, C.crime_type
 FROM prize P, award A, person PE, event_table E, works W, status_table S, crime_type C
@@ -913,7 +920,7 @@ AND S.status = "convicted"
 AND A.year_award >= E.year_event;
 
 
-#---------------------------------------------------------------------------
+#-------------------unethical_persons_unrelevant view
 CREATE VIEW unethical_persons_unrelevant AS 
 SELECT PE.person_name, COUNT(0) as nb
 FROM person PE, event_table E
@@ -922,7 +929,7 @@ GROUP BY PE.person_name
 ORDER BY nb DESC;
 
 
-#---------------------------------------------------------------------------
+#------------------unethical_persons_relevant view
 CREATE VIEW unethical_persons_relevant AS 
 SELECT PE.person_name, COUNT(0) as nb
 FROM person PE, event_table E, status_table S
@@ -934,7 +941,7 @@ AND S.status != "dropped charges"
 GROUP BY PE.person_name
 ORDER BY nb DESC;
 
-#---------------------------------------------------------------------------
+#--------------------crime_by_role view
 CREATE VIEW crime_by_role AS
 SELECT DISTINCT R.role_type, C.crime_type, COUNT(0)
 FROM event_table E, person PE, status_table S, works W, role_type R, crime_type C
@@ -947,78 +954,9 @@ AND S.status = "convicted"
 GROUP BY C.id_crime, R.id_role_type, W.id_works
 ORDER BY R.role_type;
 
-#-----------------------------------------------------------------------------Queries------------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------
-SELECT person_name, COUNT(*) AS nb 
-FROM event_table E, status_table S, person P 
-WHERE E.id_person = P.id_person 
-AND E.id_status = S.id_status 
-AND (S.status != "rumour" OR S.status != "acquitted") 
-GROUP BY person_name 
-ORDER BY nb DESC; 
 
-
-#---------------------------------------------------------------------------
-SELECT P1.person_name, P2.person_name
-FROM person P1, person P2, social_relationship SR, relationship_type R, event_table E, status_table S 
-WHERE P1.id_person = SR.id_person_1
-AND P2.id_person = SR.id_person_2
-AND SR.relationship_type_id = R.relationship_type_id
-AND (P1.id_person = E.id_person OR P2.id_person = E.id_person)
-AND E.id_status = S.id_status
-AND S.status = "convicted";
-
-
-#---------------------------------------------------------------------------
-SELECT P1.person_name AS "Married to a real life villain"
-FROM person P1, person P2, social_relationship SR, relationship_type R, event_table E, status_table S 
-WHERE P1.id_person = SR.id_person_1
-AND P2.id_person = SR.id_person_2
-AND SR.relationship_type_id = R.relationship_type_id
-AND P2.id_person = E.id_person
-AND E.id_status = S.id_status
-AND S.status = "convicted"
-UNION
-SELECT P2.person_name AS "Married to a real life villain"
-FROM person P1, person P2, social_relationship SR, relationship_type R, event_table E, status_table S 
-WHERE P2.id_person = SR.id_person_2
-AND P1.id_person = SR.id_person_1
-AND SR.relationship_type_id = R.relationship_type_id
-AND P1.id_person = E.id_person
-AND E.id_status = S.id_status
-AND S.status = "convicted";
-
-
-#---------------------------------------------------------------------------
-CREATE VIEW tempView AS
-(SELECT S.studio_name, CT.crime_type, COUNT(*) AS nb
-FROM studio S, content C, works W, person P, event_table E, crime_type CT
-WHERE S.id_studio = C.id_studio
-AND C.id_content = W.id_content
-AND W.id_person = P.id_person
-AND P.id_person = E.id_person
-AND E.id_crime = CT.id_crime
-GROUP BY S.id_studio, CT.id_crime
-ORDER BY S.id_studio);
-
-SELECT t1.* 
-FROM tempview t1
-INNER JOIN
-(
-    SELECT `studio_name`, MAX(nb) AS max_nb
-    FROM tempview
-    GROUP BY `studio_name`
-) AS t2
-    ON t1.studio_name = t2.studio_name
-    AND t1.nb = t2.max_nb;
-
-DROP VIEW tempview;
-
-
-#------------------------------------------------------------------------------------Procedural elements----------------------------------------------------------------------------
-
-
-#-------Updating subscription price
+#----------------------------------------------------------PROCEDURAL ELEMENTS
+#--------------Updating subscription price (Procedure)
 BEGIN
 DECLARE  standardPrice FLOAT DEFAULT 8.99;
 DECLARE  proPrice FLOAT DEFAULT 15.99;
@@ -1036,7 +974,7 @@ UPDATE user SET user.subscription_price = ROUND(user.subscription_price * ((100 
 AND user.id_user = a_userID; 
 END
 
-#--------Updating content name if it starts with “The ”
+#--------Updating contents' name if it starts with “The ” (Trigger)
 DROP TRIGGER IF EXISTS `UpdateContentName`
 DELIMITER $$
 CREATE DEFINER = `root`@`localhost` TRIGGER `UpdateContentName` BEFORE INSERT ON `content` 
@@ -1058,4 +996,3 @@ SET NEW.name_content = REPLACE(NEW.name_content, "The ", "");
 SET NEW.name_content = CONCAT(NEW.name_content, ", The"); 
 END IF; 
 END
-
